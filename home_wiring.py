@@ -150,7 +150,7 @@ def diagnosis():
     if (solution == 'UNSAT'):
         print('Something is wrong. I will try to identify \
 possible sources of the defect ...')
-#        possibleErrors = allNegations(everythingOK)
+        #possibleErrors = allNegations(everythingOK)
         possibleErrors = singleNegations(everythingOK)
         for e in possibleErrors:
             clauses = (axioms +

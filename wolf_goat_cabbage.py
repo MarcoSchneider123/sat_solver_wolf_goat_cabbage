@@ -5,7 +5,6 @@
 from __future__ import print_function
 import pycosat
 import sys
-import pdb
 
 #################################################################
 #
@@ -162,43 +161,28 @@ def movement_axioms(t):
         # kohl weg,              ziege weg    ziege,kohl weg  -> falsche Richtung
     ]
 
-    locations = [l[0] for l in states]
-    room_links = []
+    diff_states = [l[0] for l in states]
+    state_links = []
     # Movement axioms
     for l in states:
         room = l[0]
         for (direction, connection) in zip(actions,
                                            l[1:]):
-            # room_t ∧ direction_t → connection_t+1
-            room_links += [['~%s_%d' % (room, t),
+            # state_t ∧ direction_t → connection_t+1
+            state_links += [['~%s_%d' % (room, t),
                             '~%s_%d' % (direction, t),
                             '%s_%d' % (connection, t + 1)]]
-    # Location does not change  if we do not move
-    # robot_at_x ∧ ~north ∧ ~south ∧ ~west ∧ ~east → robot_at_x_t+1
-    # = ¬robot_at_x ∨ north ∨ south ∨ west  ∨east ∨ robot_at_x_t+1
-    no_move_no_location_change = []
-    for l in locations:
-        no_move_no_location_change += [['~%s_%d' % (l, t),
-                                        'wolf_ab_%d' % t,
-                                        'goat_ab_%d' % t,
-                                        'cabbage_ab_%d' % t,
-                                        'ferry_ab_%d' % t,
-                                        'wolf_ba_%d' % t,
-                                        'goat_ba_%d' % t,
-                                        'cabbage_ba_%d' % t,
-                                        'ferry_ba_%d' % t,
-                                        '%s_%d' % (l, t + 1)]]
 
     # There is only one robot
     # (¬ robot_at_main_office_t ∨ ¬ robot_at_mail_drop_t) ∧
     # (¬ robot_at_main_office_t ∨ ¬ robot_at_o101_t) ∧
     # (¬ robot_at_mail_drop_t ∨ ¬ robot_at_o101_t) ∧
     # ...
-    only_one_robot = []
-    for l0 in range(len(locations)):
-        for l1 in range(l0 + 1, len(locations)):
-            only_one_robot += [['~%s_%d' % (locations[l0], t),
-                                '~%s_%d' % (locations[l1], t), ]]
+    only_one_state = []
+    for l0 in range(len(diff_states)):
+        for l1 in range(l0 + 1, len(diff_states)):
+            only_one_state += [['~%s_%d' % (diff_states[l0], t),
+                                '~%s_%d' % (diff_states[l1], t), ]]
 
     # Exactly one action at a time:
     one_action_a_time = []
@@ -211,9 +195,8 @@ def movement_axioms(t):
             if (a0 != a1):
                 one_action_a_time += [['~%s_%d' % (actions[a0], t),
                                        '~%s_%d' % (actions[a1], t)]]
-    return (room_links
-            + no_move_no_location_change
-            + only_one_robot
+    return (state_links
+            + only_one_state
             + one_action_a_time
             )
 
