@@ -63,7 +63,7 @@ def get_name(index):
 
 def change_state(state, a):
     if a == "wolf_ab":
-        return state[:0] + "b" + state[1:2] + "b"
+        return "b" + state[1:3] + "b"
     elif a == "goat_ab":
         return state[:1] + "b" + state[2:3] + "b"
     elif a == "cabbage_ab":
