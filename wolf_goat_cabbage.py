@@ -165,19 +165,15 @@ def movement_axioms(t):
     state_links = []
     # Movement axioms
     for l in states:
-        room = l[0]
-        for (direction, connection) in zip(actions,
+        state = l[0]
+        for (action, connection) in zip(actions,
                                            l[1:]):
-            # state_t ∧ direction_t → connection_t+1
-            state_links += [['~%s_%d' % (room, t),
-                            '~%s_%d' % (direction, t),
+            # state_t ∧ action_t → connection_t+1
+            state_links += [['~%s_%d' % (state, t),
+                            '~%s_%d' % (action, t),
                             '%s_%d' % (connection, t + 1)]]
 
-    # There is only one robot
-    # (¬ robot_at_main_office_t ∨ ¬ robot_at_mail_drop_t) ∧
-    # (¬ robot_at_main_office_t ∨ ¬ robot_at_o101_t) ∧
-    # (¬ robot_at_mail_drop_t ∨ ¬ robot_at_o101_t) ∧
-    # ...
+    # There is only one valid state
     only_one_state = []
     for l0 in range(len(diff_states)):
         for l1 in range(l0 + 1, len(diff_states)):
@@ -187,14 +183,8 @@ def movement_axioms(t):
     # Exactly one action at a time:
     one_action_a_time = []
     # At least one action at a time
-    # north_t ∨ south_t ∨ west_t ∨ east_t ∨ pick_up_t ∨ drop_t
+    # goat_ab_t ∨ goat_ba_t ...
     one_action_a_time += [['%s_%d' % (l, t) for l in actions]]
-    # At most one action at a time
-    for a0 in range(len(actions)):
-        for a1 in range(a0 + 1, len(actions)):
-            if (a0 != a1):
-                one_action_a_time += [['~%s_%d' % (actions[a0], t),
-                                       '~%s_%d' % (actions[a1], t)]]
     return (state_links
             + only_one_state
             + one_action_a_time
@@ -207,7 +197,7 @@ def movement_axioms(t):
 #
 #################################################################
 
-t_max = 20
+t_max = 10
 axioms_up_to_time_t = []
 for t in range(0, t_max + 1):
     axioms_up_to_time_t += movement_axioms(t)
