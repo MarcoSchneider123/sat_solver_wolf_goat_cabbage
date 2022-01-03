@@ -109,7 +109,7 @@ def movement_axioms(t):
                             'robot_at_%s_%d' % (connection, t+1) ]]
     # Location does not change  if we do not move
     # robot_at_x ∧ ~north ∧ ~south ∧ ~west ∧ ~east → robot_at_x_t+1
-    # = ¬robot_at_x ∨ north ∨ south ∨ west  ∨east ∨ robot_at_x_t+1
+    # = ¬robot_at_x ∨ north ∨ south ∨ west  ∨ east ∨ robot_at_x_t+1
     no_move_no_location_change = []
     for l in locations:
         no_move_no_location_change += [['~robot_at_%s_%d' % (l, t),
@@ -120,7 +120,7 @@ def movement_axioms(t):
                                             'robot_at_%s_%d' % (l, t+1)]]
     
     # There is only one robot
-    # (¬ robot_at_main_office_t ∨ ¬ robot_at_mail_drop_t) ∧ 
+    # (¬ robot_at_main_office_t ∨ ¬ robot_at_mail_drop_t) ∧
     # (¬ robot_at_main_office_t ∨ ¬ robot_at_o101_t) ∧ 
     # (¬ robot_at_mail_drop_t ∨ ¬ robot_at_o101_t) ∧ 
     # ...

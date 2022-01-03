@@ -123,6 +123,7 @@ actions = ['wolf_ab', 'goat_ab', 'cabbage_ab', 'ferry_ab', 'wolf_ba', 'goat_ba',
 # Movement axioms
 
 def movement_axioms(t):
+    #Verwendung von Templates
     """All movmement axioms for time t."""
     # Movement plan
     # Format: State,
@@ -168,12 +169,32 @@ def movement_axioms(t):
         state = l[0]
         for (action, connection) in zip(actions,
                                            l[1:]):
-            # state_t ∧ action_t → connection_t+1
+            # state_t ∧ action_t → state_t+1
+            # Beispiel wgc_abaa_0 ∧ wolf_ab_0 → wgc_bbab_1
             state_links += [['~%s_%d' % (state, t),
                             '~%s_%d' % (action, t),
                             '%s_%d' % (connection, t + 1)]]
 
-    # There is only one valid state
+    # Location does not change  if we do not move
+    # robot_at_x ∧ ~north ∧ ~south ∧ ~west ∧ ~east → robot_at_x_t+1
+    # = ¬robot_at_x ∨ north ∨ south ∨ west  ∨ east ∨ robot_at_x_t+1
+    no_move_no_location_change = []
+    for l in diff_states:
+        no_move_no_location_change += [['~%s_%d' % (l, t),
+                                        'wolf_ab_%d' % t,
+                                        'goat_ab_%d' % t,
+                                        'cabbage_ab_%d' % t,
+                                        'ferry_ab_%d' % t,
+                                        'wolf_ba_%d' % t,
+                                        'goat_ba_%d' % t,
+                                        'cabbage_ba_%d' % t,
+                                        'ferry_ba_%d' % t,
+                                        '%s_%d' % (l, t + 1)]]
+
+    # The animals/ferryman are only at one place at a time
+    # (¬ wgc_abaa_t ∨ ¬ wgc_bbab_t) ∧
+    # (¬ wgc_abaa_t ∨ ¬ wgc_bbbb_t) ∧
+    # ...
     only_one_state = []
     for l0 in range(len(diff_states)):
         for l1 in range(l0 + 1, len(diff_states)):
@@ -185,8 +206,15 @@ def movement_axioms(t):
     # At least one action at a time
     # goat_ab_t ∨ goat_ba_t ...
     one_action_a_time += [['%s_%d' % (l, t) for l in actions]]
+    # At most one action at a time
+    for a0 in range(len(actions)):
+        for a1 in range(a0 + 1, len(actions)):
+            if (a0 != a1):
+                one_action_a_time += [['~%s_%d' % (actions[a0], t),
+                                       '~%s_%d' % (actions[a1], t)]]
     return (state_links
             + only_one_state
+            + no_move_no_location_change
             + one_action_a_time
             )
 
